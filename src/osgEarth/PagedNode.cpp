@@ -23,6 +23,8 @@
 
 #define LC "[PagedNode] "
 
+#include <osgEarth/CameraUtils>
+#include <iostream>
 using namespace osgEarth;
 using namespace osgEarth::Util;
 
@@ -60,7 +62,11 @@ PagedNode2::traverse(osg::NodeVisitor& nv)
             }
         }
     }
-
+    // wyj: 
+    if (nv.asCullVisitor() && osgEarth::Util::CameraUtils::isShadowCamera(nv.asCullVisitor()->getCurrentCamera())) {
+        traverseChildren(nv);
+        return;
+    }
     if (nv.getTraversalMode() == nv.TRAVERSE_ACTIVE_CHILDREN)
     {
         if (nv.getVisitorType() == nv.CULL_VISITOR)
@@ -69,6 +75,9 @@ PagedNode2::traverse(osg::NodeVisitor& nv)
 
             if (_useRange) // meters
             {
+                // wyj:
+                auto ce = getBound().center();
+                //std::cout << "center " << ce.x() << ", " << ce.y() << ", " << ce.z() << "\n";
                 float range = std::max(0.0f, nv.getDistanceToViewPoint(getBound().center(), true) - getBound().radius());
                 inRange = (range >= _minRange && range <= _maxRange);
                 _priority = -range * _priorityScale;

@@ -316,6 +316,11 @@ namespace
     GeoExtent
         s_getTileExtent(unsigned lod, unsigned tileX, unsigned tileY, const GeoExtent& fullExtent)
     {
+        // wyj: wgs84
+        if (fullExtent.getSRS()->isGeodetic()) {
+            return osgEarth::TileKey(lod, tileX, tileY, osgEarth::Registry::instance()->getGlobalGeodeticProfile()).getExtent();
+        }
+        
         double w = fullExtent.width();
         double h = fullExtent.height();
         for (unsigned i = 0; i < lod; ++i) {
@@ -863,12 +868,25 @@ FeatureModelGraph::setupPaging()
     {
         osg::observer_ptr<FeatureModelGraph> graph_weakptr(this);
         osg::ref_ptr<const osgDB::Options> readOptions = _session->getDBOptions();
-        auto load_func = [graph_weakptr, uri, readOptions](Cancelable* c)
+        auto load_func = [graph_weakptr, uri, readOptions, featureProfile](Cancelable* c)
         {
             osg::ref_ptr<osg::Group> result;
             osg::ref_ptr<FeatureModelGraph> graph;
+            
             if (graph_weakptr.lock(graph))
-                result = graph->load(0, 0, 0, uri, readOptions.get());
+            {
+				// wyj
+				if (featureProfile->getSRS()->isGeodetic())
+                {
+                    result = graph->load(0, 0, 0, uri, readOptions.get());
+                    result = graph->load(0, 1, 0, uri, readOptions.get());
+                } 
+                else
+                {
+                    result = graph->load(0, 0, 0, uri, readOptions.get());
+                }
+            }
+                
             return result;
         };
 
@@ -945,6 +963,11 @@ FeatureModelGraph::load(
             featureProfile->getTilingProfile()->getNumTiles(lod, w, h);
             int invertedTileY = h - tileY - 1;
 
+            // wyj: wgs84下invertedTileY会造成lat取反
+            if (featureProfile->getTilingProfile()->getSRS()->isGeodetic())
+            {
+                invertedTileY = tileY;
+            }
             TileKey key(lod, tileX, invertedTileY, featureProfile->getTilingProfile());
 
             geometry = buildTile(level, tileExtent, &key, readOptions);
