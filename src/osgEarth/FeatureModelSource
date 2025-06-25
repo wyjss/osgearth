@@ -91,6 +91,8 @@ namespace osgEarth
         /** Options feature filters */
         OE_OPTION_VECTOR(ConfigOptions, filters);
 
+        // wyj 
+        OE_OPTION(bool, refineAdd, true);
     public:
         FeatureModelOptions(const ConfigOptions& co =ConfigOptions());
 

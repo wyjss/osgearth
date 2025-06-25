@@ -534,8 +534,30 @@ SubstituteModelFilter::process(const FeatureList&           features,
     // active DrawInstanced if required:
     if ( _useDrawInstanced )
     {
-        DrawInstanced::convertGraphToUseDrawInstanced( attachPoint );
-
+#if 1
+        DrawInstanced::convertGraphToUseDrawInstanced(attachPoint);
+#else
+        if (attachPoint->getNumChildren() > 500) {
+            std::vector<osg::ref_ptr<osg::Group>> gs;
+            int gCount = ceil(attachPoint->getNumChildren() / 500.0);
+            int splitCount = attachPoint->getNumChildren() / gCount + 1;
+            int childIndex = 0;
+            for (int i = 0; i < gCount; ++i) {
+                osg::ref_ptr<osg::Group> g = new osg::Group;
+                for (int j = 0; j < splitCount && childIndex < attachPoint->getNumChildren(); ++j) {
+                    g->addChild(attachPoint->getChild(childIndex++));
+                }
+                DrawInstanced::convertGraphToUseDrawInstanced(g);
+                gs.push_back(g);
+            }
+            attachPoint->removeChild(0, attachPoint->getNumChildren());
+            for (auto g : gs) {
+                attachPoint->addChild(g);
+            }
+        } else {
+            DrawInstanced::convertGraphToUseDrawInstanced(attachPoint);
+        }
+#endif
         // install a shader program to render draw-instanced.
         DrawInstanced::install( attachPoint->getOrCreateStateSet() );
     }

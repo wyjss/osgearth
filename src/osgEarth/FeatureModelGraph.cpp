@@ -1165,7 +1165,15 @@ FeatureModelGraph::buildSubTilePagedLODs(
                         _defaultFileLocationCallback.get(),
                         readOptions,
                         this);
-
+                    
+                    if (this->_options.refineAdd().isSet()) {
+                        auto pageNode = dynamic_cast<PagedNode2*>(childNode.get());
+                        pageNode->setTileKey(osgEarth::TileKey(subtileLOD, u, v, osgEarth::Registry::instance()->getGlobalMercatorProfile()));
+                        if (pageNode) {
+							bool add = this->_options.refineAdd().value();
+                            pageNode->setRefinePolicy(add ? osgEarth::REFINE_ADD : osgEarth::REFINE_REPLACE);
+                        }
+                    }
 #ifdef USE_POLYTOPE_CULLING
                     // TEST: polytope culler
                     // Thoughts. How should we set the Z-range? How much does it matter?
