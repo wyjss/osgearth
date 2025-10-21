@@ -3,6 +3,7 @@
 #pragma vp_location   vertex_view
 #pragma vp_order      last
 
+#pragma import_defines(RAGIS_DISABLE_SHADOW)
 
 uniform mat4 oe_shadow_matrix[$OE_SHADOW_NUM_SLICES];
 uniform float oe_shadow_maxrange;
@@ -10,6 +11,10 @@ uniform float oe_shadow_maxrange;
 out vec4 oe_shadow_coord[$OE_SHADOW_NUM_SLICES];
 out float oe_shadow_rf;
 
+#ifdef RAGIS_DISABLE_SHADOW
+void oe_shadow_vertex(inout vec4 VertexVIEW)
+{}
+#else //RAGIS_DISABLE_SHADOW
 void oe_shadow_vertex(inout vec4 VertexVIEW)
 {
     for(int i=0; i < $OE_SHADOW_NUM_SLICES; ++i)
@@ -20,7 +25,7 @@ void oe_shadow_vertex(inout vec4 VertexVIEW)
     oe_shadow_rf = clamp(-VertexVIEW.z / oe_shadow_maxrange, 0.0, 1.0);
     oe_shadow_rf = oe_shadow_rf * oe_shadow_rf * oe_shadow_rf;
 }
-
+#endif //RAGIS_DISABLE_SHADOW
 
 [break]
 #pragma vp_name       Shadowing Fragment Shader
@@ -30,6 +35,7 @@ void oe_shadow_vertex(inout vec4 VertexVIEW)
 
 #pragma import_defines(OE_LIGHTING)
 #pragma import_defines(OE_NUM_LIGHTS)
+#pragma import_defines(RAGIS_DISABLE_SHADOW)
 
 uniform sampler2DArray oe_shadow_map;
 uniform float          oe_shadow_color;
@@ -101,6 +107,10 @@ float oe_shadow_multisample(in vec3 c, in float refvalue, in float blur)
     return 1.0-(shadowed/OE_SHADOW_NUM_SAMPLES);
 }
 
+#ifdef RAGIS_DISABLE_SHADOW
+void oe_shadow_fragment(inout vec4 color)
+{}
+#else //RAGIS_DISABLE_SHADOW
 void oe_shadow_fragment(inout vec4 color)
 {
     float alpha = color.a;
@@ -137,3 +147,4 @@ void oe_shadow_fragment(inout vec4 color)
     oe_pbr.roughness = clamp(mix(oe_pbr.roughness*1.5, oe_pbr.roughness, out_of_shadow), 0, 1);
     color.rgb = mix(color.rgb * oe_shadow_color, color.rgb, out_of_shadow);
 }
+#endif //RAGIS_DISABLE_SHADOW
