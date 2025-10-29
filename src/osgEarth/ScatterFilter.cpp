@@ -71,6 +71,12 @@ ScatterFilter::polyScatter(const Geometry*         input,
         if ( numInstancesInBoundingRect == 0 )
             continue;
 
+        // wyj compute zMin
+        zMin = FLT_MAX;
+        for (int i = 0; i < polygon->size(); ++i) {
+            zMin = std::min<double>(zMin, polygon->at(i).z());
+        }
+
         if ( _random )
         {
             // Random scattering. Note, we try to place as many instances as would

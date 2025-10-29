@@ -1309,6 +1309,23 @@ VirtualProgram::apply(osg::State& state) const
 
     const unsigned contextID = GLUtils::getSharedContextID(state);
 
+    static unsigned int s_lastFrame = 0;
+    static int s_count = 0;
+    static int s_buildCount = 0;
+    static double s_lastTime = 0;
+    unsigned int curFrame = state.getFrameStamp()->getFrameNumber();
+    auto curTime = osg::Timer::instance()->time_s();
+	if (s_lastFrame != curFrame) {
+// 		std::cout << "vp debug:\n";
+// 		std::cout << "\tcount:" << s_count << "\n";
+// 		std::cout << "\tbuildCount:" << s_buildCount << "\n";
+// 		std::cout << "\tbuildTime:" << s_lastTime * 1000 << "\n";
+
+		s_lastFrame = curFrame;
+		s_count = s_buildCount = s_lastTime = 0;
+	}
+
+    ++s_count;
     if (_shaderMap.empty() && !_inheritSet)
     {
         // If there's no data in the VP, and never has been, unload any existing program.
@@ -1344,7 +1361,13 @@ VirtualProgram::apply(osg::State& state) const
     // stack-memory construct below which will "remember" whether 
     // the VP has already been applied during the current frame using
     // the same an identical attribute stack.
-    state.haveAppliedAttribute(this->SA_TYPE);
+    // wyj:
+    static bool s_b = true;
+    if (s_b) {
+        s_b = false;
+        std::cout << "wyj: mark: vp!!!!!!!!!!" << std::endl;
+    }
+    //state.haveAppliedAttribute(this->SA_TYPE);
 
     // We need to tracks whether there are any accept callbacks, because if so
     // we cannot store the program in stack memory -- the accept callback can
@@ -1426,9 +1449,10 @@ VirtualProgram::apply(osg::State& state) const
 
         program = Registry::programRepo().use(local.programKey, frameNumber, _id);
 #endif
-
+        
         if (!program.valid())
         {
+            s_buildCount++;
             // build a new set of accumulated functions, to support the creation of main()
             FunctionLocationMap accumFunctions;
             accumulateFunctions(state, accumFunctions);
@@ -1547,6 +1571,8 @@ VirtualProgram::apply(osg::State& state) const
         _lastUsedProgram[contextID] = program.get();
 #endif
     }
+
+    s_lastTime += (osg::Timer::instance()->time_s() - curTime);
 }
 
 bool

@@ -555,7 +555,7 @@ SharedGeometry::drawPrimitivesImplementation(osg::RenderInfo& renderInfo) const
     const void* indices;
     bool usingVAO = state.useVertexArrayObject(_useVertexArrayObject);
     osg::GLBufferObject* ebo = _drawElements->getOrCreateGLBufferObject(GLUtils::getSharedContextID(state));
-
+  
     if (usingVAO)
     {
         // for a VAO, the EBO is already bound, and the indices is
@@ -573,12 +573,20 @@ SharedGeometry::drawPrimitivesImplementation(osg::RenderInfo& renderInfo) const
         // for legacy GL, use the actual CPU memory address
         indices = _drawElements->getDataPointer();
     }
+//     if (!indices) {
+//         std::cout << "wyj: !!! indices = null" <<
+//             ",usingVAO:" << usingVAO <<
+//             ",ebo:"<< ebo<<
+//             ",_drawElements:"<< _drawElements<<
+//             "\n";
+//         //return;
+//     }
 
-    glDrawElements(
-        primitiveType,
-        _drawElements->getNumIndices(),
-        _drawElements->getDataType(),
-        indices);
+	glDrawElements(
+		primitiveType,
+		_drawElements->getNumIndices(),
+		_drawElements->getDataType(),
+		indices);
 }
 
 void SharedGeometry::drawImplementation(osg::RenderInfo& renderInfo) const

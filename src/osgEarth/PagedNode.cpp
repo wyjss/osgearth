@@ -23,6 +23,8 @@
 
 #define LC "[PagedNode] "
 
+#include <osgEarth/CameraUtils>
+#include <iostream>
 using namespace osgEarth;
 using namespace osgEarth::Util;
 
@@ -60,6 +62,17 @@ PagedNode2::traverse(osg::NodeVisitor& nv)
             }
         }
     }
+   
+	// wyj: 
+	if (nv.asCullVisitor()) {
+		auto camera = nv.asCullVisitor()->getCurrentCamera();
+		if (CameraUtils::isShadowCamera(camera) ||
+			CameraUtils::isDepthCamera(camera) ||
+			CameraUtils::isPickCamera(camera)) {
+			traverseChildren(nv);
+			return;
+		}
+	}
 
     if (nv.getTraversalMode() == nv.TRAVERSE_ACTIVE_CHILDREN)
     {
@@ -69,6 +82,9 @@ PagedNode2::traverse(osg::NodeVisitor& nv)
 
             if (_useRange) // meters
             {
+                // wyj:
+                auto ce = getBound().center();
+                //std::cout << "center " << ce.x() << ", " << ce.y() << ", " << ce.z() << "\n";
                 float range = std::max(0.0f, nv.getDistanceToViewPoint(getBound().center(), true) - getBound().radius());
                 inRange = (range >= _minRange && range <= _maxRange);
                 _priority = -range * _priorityScale;
@@ -84,6 +100,10 @@ PagedNode2::traverse(osg::NodeVisitor& nv)
                 }
             }
 
+            if (_forceLoad) {
+                _forceLoad = false;
+                inRange = true;
+            }
             if (inRange)
             {
                 if (_load_function && _loaded.empty() && !_loadGate.exchange(true))
@@ -131,6 +151,47 @@ PagedNode2::traverse(osg::NodeVisitor& nv)
 void
 PagedNode2::traverseChildren(osg::NodeVisitor& nv)
 {
+  //  if (_tileKey.getLOD() == 14) {
+  //      int a = 0;
+  //  }
+  //  // wyj fix REPLACE
+  //  osg::Group* g = _children.size() == 1 ? _children[0]->asGroup() : nullptr;
+  //  if (g && g->getNumChildren() == 5)
+  //  {
+  //      bool skipSelf = _refinePolicy == REFINE_REPLACE;
+  //      if (skipSelf) 
+  //      {
+  //          skipSelf = false;
+		//	for (int i = 0; i < g->getNumChildren(); ++i)
+		//	{
+		//		auto child = g->getChild(i);
+		//		if (auto pageNode = dynamic_cast<PagedNode2*>(child))
+		//		{
+  //                  skipSelf |= (pageNode->isLoadComplete() && pageNode->_merged.has_value(true));
+		//		}
+		//	}
+  //      }
+		//for (int i = 0; i < g->getNumChildren(); ++i)
+		//{
+		//	auto child = g->getChild(i);
+  //          auto pageNode = dynamic_cast<PagedNode2*>(child);
+  //          if (pageNode && skipSelf) {
+  //              pageNode->setForceLoad(true);
+  //          }
+
+  //          if (!pageNode && skipSelf)
+  //          {
+  //              ;
+  //          }
+  //          else
+  //          {
+  //              child->accept(nv);
+  //          }
+		//}
+  //     
+  //      return;
+  //  }
+    //
     if (_refinePolicy == REFINE_REPLACE && _merged.has_value(true))
     {
         _loaded.value()->accept(nv);

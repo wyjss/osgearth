@@ -258,7 +258,8 @@ namespace osgEarth { namespace MVT
                     currentRing->close();
                     
                     // New polygon
-                    if (area > 0)
+                    // TODO wyj 暂时，避免精度损失至重复的单点 
+                    if (area >= 0)
                     {
                         currentRing->rewind(Geometry::ORIENTATION_CCW);
                         currentPolygon = new osgEarth::Polygon(&currentRing->asVector());

@@ -259,6 +259,13 @@ AltitudeFilter::pushAndClamp( FeatureList& features, FilterContext& cx )
             {
                 std::vector<osg::Vec3d> temp(1);
                 temp[0].set(centroid.x(), centroid.y(), 0);
+                // wyj 
+                if (featureSRS->isMercator()) {
+                    double x, y;
+                    featureSRS->transform2D(centroid.x(), centroid.y(), featureSRS->getGeodeticSRS(), x, y);
+                    temp[0].set(x, y, 0);
+                }
+                //
                 envelope.sampleMapCoords(temp.begin(), temp.end(), nullptr);
                 centroid.z() = temp[0].z();
                 centroidElevation = centroid.z();

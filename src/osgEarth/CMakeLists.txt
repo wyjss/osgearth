@@ -854,7 +854,7 @@ if(Protobuf_FOUND AND Protobuf_PROTOC_EXECUTABLE)
     endif()
     
     #include_directories(${Protobuf_INCLUDE_DIR})
-    target_link_libraries(${LIB_NAME} PRIVATE protobuf::libprotobuf)
+    target_link_libraries(${LIB_NAME} PRIVATE protobuf::libprotobuf ${Protobuf_LIBRARY})
 endif()
 
 # spdlog support?

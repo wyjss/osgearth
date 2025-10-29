@@ -460,6 +460,15 @@ public:
 
     struct DC : public osg::Drawable::DrawCallback {
         void drawImplementation(osg::RenderInfo& ri, const osg::Drawable* drawable) const {
+//             static auto s_lastFrame = ri.getView()->getFrameStamp()->getFrameNumber();
+//             static int s_count = 0;
+//             auto curFrame = ri.getView()->getFrameStamp()->getFrameNumber();
+//             if (curFrame != s_lastFrame) {
+//                 std::cout << "draw di count " << s_count << "\n";
+//                 s_lastFrame = curFrame;
+//                 s_count = 0;
+//             }
+//             ++s_count;
             drawable->drawImplementation(ri);
             // prevents a crash
             ri.getState()->unbindVertexArrayObject();

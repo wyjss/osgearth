@@ -62,6 +62,11 @@ struct OE_PBR { float displacement, roughness, ao, metal; } oe_pbr;
 
 void atmos_pbr_spec(in vec3 vertex_dir, in vec3 vert_to_light, in vec3 N, inout vec3 ambience, inout vec3 COLOR)
 {
+    // wyj: 避免背面黑圈，无pbr（2.5）直接return
+    if((oe_pbr.displacement + oe_pbr.roughness + oe_pbr.ao + oe_pbr.metal) == 2.5){
+        return;
+    }
+
     // PBR (https://learnopengl.com/PBR/Lighting)
     vec3 V = -vertex_dir;
     vec3 L = normalize(vert_to_light);

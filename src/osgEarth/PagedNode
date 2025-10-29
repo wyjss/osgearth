@@ -187,6 +187,12 @@ namespace osgEarth { namespace Util
         //! be removed if setAutoUnload is true.
         void touch();
 
+        void setForceLoad(bool b) {
+            _forceLoad = b;
+        }
+        void setTileKey(const osgEarth::TileKey& key) {
+            _tileKey = key;
+        }
     public: // LoadableNode API
 
         void load() override;
@@ -247,6 +253,9 @@ namespace osgEarth { namespace Util
         mutable float _priority = 0.0f;
         RefinePolicy _refinePolicy = REFINE_REPLACE;
         std::string _jobpoolName;
+        // wyj
+        bool _forceLoad = false;
+        osgEarth::TileKey _tileKey;
 
         bool merge(int revision);
         void traverseChildren(osg::NodeVisitor& nv);
