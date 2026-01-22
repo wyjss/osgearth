@@ -1033,6 +1033,7 @@ ElevationLayerVector::populateHeightField(
     // If we need to mosaic multiple layers or resample it to a new output tilesize go through a resampling loop.
     if (requiresResample)
     {
+        //auto t = osg::Timer::instance()->time_m();
         // We will load the actual heightfields on demand. We might not need them all.
         w.heightFields.assign(w.contenders.size(), {});
         w.heightFieldActualKeys.assign(w.contenders.size(), {});
@@ -1222,6 +1223,9 @@ ElevationLayerVector::populateHeightField(
                 }
             }
         }
+
+        //t = osg::Timer::instance()->time_m() - t;
+        //printf("resample %s time %d\n", w.contenders[0].key.str().c_str(), int(t));
     }
 
 #ifdef ANALYZE

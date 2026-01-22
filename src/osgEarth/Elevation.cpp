@@ -247,7 +247,9 @@ NormalMapGenerator::createNormalMap(
     ElevationPool::WorkingSet* workingSet = static_cast<ElevationPool::WorkingSet*>(ws);
 
     osg::ref_ptr<osg::Image> image = new osg::Image();
-    image->allocateImage(ELEVATION_TILE_SIZE, ELEVATION_TILE_SIZE, 1, GL_RG, GL_UNSIGNED_BYTE);
+    // wyj
+    //image->allocateImage(ELEVATION_TILE_SIZE, ELEVATION_TILE_SIZE, 1, GL_RG, GL_UNSIGNED_BYTE);
+    image->allocateImage(129, 129, 1, GL_RG, GL_UNSIGNED_BYTE);
     image->setInternalTextureFormat(GL_RG8);
 
     ElevationPool* pool = map->getElevationPool();

@@ -155,6 +155,13 @@ public:
         return WriteResult::ERROR_IN_WRITING_FILE;
     }
 
+    // wyj
+    WriteResult writeNode(const osg::Node& node, std::ostream& fout, const Options* options) const
+    {
+		GLTFWriter writer;
+		return writer.write(node, fout, true, options);
+    }
+
 };
 
 REGISTER_OSGPLUGIN(gltf, GLTFReaderWriter)
