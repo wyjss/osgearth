@@ -1365,7 +1365,7 @@ VirtualProgram::apply(osg::State& state) const
     static bool s_b = true;
     if (s_b) {
         s_b = false;
-        std::cout << "wyj: mark: vp!!!!!!!!!!" << std::endl;
+        //std::cout << "wyj: mark: vp!!!!!!!!!!" << std::endl;
     }
     //state.haveAppliedAttribute(this->SA_TYPE);
 

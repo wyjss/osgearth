@@ -458,9 +458,11 @@ TerrainTileModelFactory::addElevation(
 
             if (_options.useNormalMaps() == true)
             {
+                //auto t = osg::Timer::instance()->time_m();
                 // Make a normal map if it doesn't already exist
                 elevTex->generateNormalMap(map, &_workingSet, progress);
-
+                //t = osg::Timer::instance()->time_m() - t;
+                //printf("gen normal %s time: %d\n", elevTex->getTileKey().str().c_str(), int(t));
                 if (elevTex->getNormalMapTexture())
                 {
                     elevTex->getNormalMapTexture()->setName(key.str() + ":normalmap");

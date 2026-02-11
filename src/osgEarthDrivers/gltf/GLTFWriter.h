@@ -566,6 +566,26 @@ public:
         return osgDB::ReaderWriter::WriteResult::FILE_SAVED;
     }
 
+    // wyj
+	osgDB::ReaderWriter::WriteResult write(const osg::Node& node,
+										   std::ostream& location,
+										   bool isBinary,
+										   const osgDB::Options* options) const
+	{
+		tinygltf::Model model;
+		convertOSGtoGLTF(node, model);
+
+		tinygltf::TinyGLTF writer;
+
+		writer.WriteGltfSceneToStream(
+			&model,
+            location,
+			true,           // prettyPrint
+			isBinary);      // writeBinary
+
+		return osgDB::ReaderWriter::WriteResult::FILE_SAVED;
+	}
+
     void convertOSGtoGLTF(const osg::Node& node, tinygltf::Model& model) const
     {
         model.asset.version = "2.0";
